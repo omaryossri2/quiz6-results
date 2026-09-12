@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Quiz 6 Results</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -67,7 +72,34 @@
   .qans{font-size:.8rem;color:var(--muted-foreground);white-space:pre-line;margin-bottom:5px;}
   .qfb{font-size:.78rem;color:var(--accent-foreground);white-space:pre-line;}
   @media (prefers-reduced-motion: reduce){ .chev{transition:none;} }
+
+  @media (max-width: 640px){
+    body{padding:20px 12px 60px;}
+    .cards{grid-template-columns:repeat(2,1fr);}
+    .board{border-radius:8px;}
+    .row{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      grid-template-areas:
+        "rank name chev"
+        "bar bar bar"
+        "pct pct score";
+      row-gap:6px;
+      column-gap:10px;
+      padding:12px 14px;
+    }
+    .rank{grid-area:rank;}
+    .name{grid-area:name;min-width:0;overflow-wrap:break-word;}
+    .chev{grid-area:chev;}
+    .barwrap{grid-area:bar;}
+    .pct{grid-area:pct;width:auto;text-align:left;}
+    .score{grid-area:score;width:auto;}
+    .qgrid{grid-template-columns:1fr;}
+    .qhead{font-size:.78rem;}
+  }
 </style>
+</head>
+<body>
 
 <div class="wrap">
   <h1>Quiz 6 &mdash; Results</h1>
@@ -141,3 +173,5 @@ board.querySelectorAll('.row').forEach(row => {
   row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(row); } });
 });
 </script>
+</body>
+</html>
