@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -15,22 +16,6 @@
     --brand-highlight:#FFDE1A; --brand-highlight-foreground:#171423;
     --destructive:#D64545; --destructive-foreground:#FFFFFF;
     --border:rgba(23,20,35,.08); --radius:10px;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --background:#171423; --foreground:#F5F3FC; --card:#211C33;
-      --primary:#6E5EE0; --secondary:#3DC2EC; --muted:#2B2440;
-      --muted-foreground:rgba(245,243,252,.6); --accent:#2B2440;
-      --accent-foreground:#B6ABF5; --destructive:#E4685F; --destructive-foreground:#171423;
-      --border:rgba(245,243,252,.1);
-    }
-  }
-  :root[data-theme="dark"]{
-    --background:#171423; --foreground:#F5F3FC; --card:#211C33;
-    --primary:#6E5EE0; --secondary:#3DC2EC; --muted:#2B2440;
-    --muted-foreground:rgba(245,243,252,.6); --accent:#2B2440;
-    --accent-foreground:#B6ABF5; --destructive:#E4685F; --destructive-foreground:#171423;
-    --border:rgba(245,243,252,.1);
   }
   *{box-sizing:border-box;}
   body{
