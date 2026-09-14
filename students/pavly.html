@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --background:#F5F3FC; --foreground:#171423; --card:#FFFFFF;
+    --primary:#4C3BCF; --primary-foreground:#FFFFFF; --secondary:#3DC2EC;
+    --muted:#EEEBFB; --muted-foreground:rgba(23,20,35,.55);
+    --accent:#EEEBFB; --accent-foreground:#4C3BCF;
+    --brand-highlight:#FFDE1A; --brand-highlight-foreground:#171423;
+    --destructive:#D64545; --destructive-foreground:#FFFFFF;
+    --border:rgba(23,20,35,.08); --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --background:#171423; --foreground:#F5F3FC; --card:#211C33;
+      --primary:#6E5EE0; --secondary:#3DC2EC; --muted:#2B2440;
+      --muted-foreground:rgba(245,243,252,.6); --accent:#2B2440;
+      --accent-foreground:#B6ABF5; --destructive:#E4685F; --destructive-foreground:#171423;
+      --border:rgba(245,243,252,.1);
+    }
+  }
+  :root[data-theme="dark"]{
+    --background:#171423; --foreground:#F5F3FC; --card:#211C33;
+    --primary:#6E5EE0; --secondary:#3DC2EC; --muted:#2B2440;
+    --muted-foreground:rgba(245,243,252,.6); --accent:#2B2440;
+    --accent-foreground:#B6ABF5; --destructive:#E4685F; --destructive-foreground:#171423;
+    --border:rgba(245,243,252,.1);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--background); color:var(--foreground);
+    font-family:'Montserrat',system-ui,sans-serif; padding:32px 16px 80px;
+  }
+  .wrap{max-width:960px;margin:0 auto;}
+  h1{font-size:1.6rem;font-weight:800;margin:0 0 4px;text-wrap:balance;}
+  .sub{color:var(--muted-foreground);font-size:.9rem;margin-bottom:28px;font-variant-numeric:tabular-nums;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px;}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+  .stat .n{font-size:1.6rem;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;}
+  .stat .l{font-size:.78rem;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+  .legend{display:flex;gap:16px;margin:0 0 14px;font-size:.8rem;color:var(--muted-foreground);}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:5px;}
+  .board{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  a.row{color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);}
+  a.row:last-child{border-bottom:none;}
+  a.row:hover{background:var(--accent);}
+  a.row:focus-visible{outline:2px solid var(--primary);outline-offset:-2px;}
+  .rank{width:22px;font-weight:800;color:var(--muted-foreground);text-align:center;font-variant-numeric:tabular-nums;}
+  .name{flex:1;font-weight:600;}
+  .barwrap{flex:2;height:8px;background:var(--muted);border-radius:99px;overflow:hidden;}
+  .bar{height:100%;background:var(--primary);border-radius:99px;}
+  .pct{width:48px;text-align:right;font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums;}
+  .score{width:60px;text-align:right;color:var(--muted-foreground);font-size:.85rem;font-variant-numeric:tabular-nums;}
+  .chev{width:16px;color:var(--muted-foreground);}
+  .qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;}
+  .qcard{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:var(--background);}
+  .qhead{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.8rem;margin-bottom:5px;font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .qmark{padding:1px 8px;border-radius:99px;font-size:.72rem;font-weight:700;font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .full{background:var(--primary);color:var(--primary-foreground);}
+  .partial{background:var(--brand-highlight);color:var(--brand-highlight-foreground);}
+  .zero{background:var(--destructive);color:var(--destructive-foreground);}
+  .qans{font-size:.8rem;color:var(--muted-foreground);white-space:pre-line;margin-bottom:5px;}
+  .qfb{font-size:.78rem;color:var(--accent-foreground);white-space:pre-line;}
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted-foreground);text-decoration:none;font-size:.85rem;font-weight:600;margin-bottom:16px;}
+  .back:hover{color:var(--primary);}
+  .back:focus-visible{outline:2px solid var(--primary);outline-offset:2px;}
+  .studenthead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .studenthead h1{margin:0;}
+  .bigpct{font-size:1.6rem;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;}
+
+  @media (max-width: 640px){
+    body{padding:20px 12px 60px;}
+    .cards{grid-template-columns:repeat(2,1fr);}
+    .board{border-radius:8px;}
+    a.row{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      grid-template-areas:
+        "rank name chev"
+        "bar bar bar"
+        "pct pct score";
+      row-gap:6px;
+      column-gap:10px;
+      padding:12px 14px;
+    }
+    .rank{grid-area:rank;}
+    .name{grid-area:name;min-width:0;overflow-wrap:break-word;}
+    .chev{grid-area:chev;}
+    .barwrap{grid-area:bar;}
+    .pct{grid-area:pct;width:auto;text-align:left;}
+    .score{grid-area:score;width:auto;}
+    .qgrid{grid-template-columns:1fr;}
+    .qhead{font-size:.78rem;}
+    .studenthead{display:block;}
+    .bigpct{display:block;margin-top:4px;}
+  }
+</style>
+<title>Pavly — Quiz 6 Results</title>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">&larr; Class results</a>
+  <div class="studenthead">
+    <h1>Pavly</h1>
+    <div class="bigpct">57/75 &middot; 76%</div>
+  </div>
+  <div class="sub">Rank 4 of 6 · submitted 9/12/2026, 7:35:34 PM</div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--primary)"></span>Full marks</span>
+    <span><span class="dot" style="background:var(--brand-highlight)"></span>Partial</span>
+    <span><span class="dot" style="background:var(--destructive)"></span>No marks</span>
+  </div>
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="qhead"><span>1(a)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">A</div>
+      <div class="qfb">No credit earned; the correct answer is D (nibble), but the student selected A (byte).</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>1(b)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">2096 TiB</div>
+      <div class="qfb">No marks earned - the correct conversion is 2 PiB = 2048 TiB.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>1(c)(i)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">Compression</div>
+      <div class="qfb">Correct answer &#39;Compression&#39; matches the mark scheme&#39;s required answer.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>1(c)(ii)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">To decrease bandwidth when installing a file over the internet</div>
+      <div class="qfb">Answer states reducing file size decreases bandwidth needed when transmitting the file, matching the mark scheme point &#39;Less bandwidth required to transmit the file&#39;.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(a)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">Printer</div>
+      <div class="qfb">Correct answer &#39;Printer&#39; matches the mark scheme exactly.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(b)(i)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">14B: 000101001011
+97A: 10010111101010</div>
+      <div class="qfb">14B correctly converted to binary as 0001 0100 1011 (000101001011), earning 1 mark.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(b)(ii)</span><span class="qmark full">2/2</span></div>
+      <div class="qans">1 Easier to read
+2 Easier to display as it takes less space</div>
+      <div class="qfb">Both points match the mark scheme: &#39;Easier to read&#39; matches &#39;easier/quicker to understand/read&#39;; &#39;takes less space&#39; matches &#39;takes up less space on the ticket&#39;.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(c)(i)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">14B: 44
+02C: 0</div>
+      <div class="qfb">The value 44 is present, which is the correct decimal conversion of 02C, so one mark is awarded for this correct value despite being mislabelled as &#39;14B&#39;.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(c)(ii)</span><span class="qmark full">2/2</span></div>
+      <div class="qans">109: 06D
+415: 19F</div>
+      <div class="qfb">Both hexadecimal conversions are correct: 109 = 6D (leading 0 optional) and 415 = 19F.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>3</span><span class="qmark full">4/4</span></div>
+      <div class="qans">Pixel: This is the smallest component of an image.
+resolution: it&#39;s the amount of pixels that make up an image.
+Color Depth: This is the number of bits used to create each colour in an image.
+Meta Data: This is additional data that is stored with an image that can provide information such as the time and date the image was taken.</div>
+      <div class="qfb">All four term-definition pairs are correct: pixel (smallest component of an image), resolution (amount of pixels that make up an image, matching &#39;number of pixels in an image&#39;), colour depth (number of bits used to create each colour), and metadata (additional data such as time and date the image was taken).</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(a)(i)</span><span class="qmark full">2/2</span></div>
+      <div class="qans">1 Serial is a suitable method as data is less likely to be skewed.
+2 Full duplex is suitable as both the restaurant and user can easily communicate and send data to each other.</div>
+      <div class="qfb">Both points match valid mark scheme reasons: serial suitable as data is less likely to be skewed/arrive out of order, and full-duplex suitable as data needs to travel in both directions between restaurant and customer.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(a)(ii)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">Data transmission would be faster</div>
+      <div class="qfb">States data transmission would be faster, matching the mark scheme&#39;s accepted answer.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(b)(i)</span><span class="qmark full">5/5</span></div>
+      <div class="qans">Sender computer picks checksum algorithm and then uses calculates the checksum value of the data then sends the data along side checksum value to the receiver computer. The receiver computer then calculates the checksum value of the data then the receiver if both values match then transmission is done successfully. If to the sender and if it doesn&#39;t then sender is requested to resend the data</div>
+      <div class="qfb">Answer correctly describes: checksum calculated from data by sender, checksum sent alongside data, checksum recalculated by receiver, comparison of values with matching values indicating no error and non-matching indicating an error, and a resend request if an error is detected. This covers five valid marking points.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(b)(ii)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">Parity check</div>
+      <div class="qfb">The answer &#39;Parity check&#39; aligns with the accepted alternative &#39;Parity byte/block check&#39; in the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(c)(i)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">D</div>
+      <div class="qfb">Correct answer D selected, matching the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(c)(ii)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">as packets can be unordered correctly as they are sent from a route to the computer and to assemble the program correctly</div>
+      <div class="qfb">Credit given for stating that packets can arrive unordered/out of order, matching the mark scheme point about packets arriving in the wrong order.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>5(a)</span><span class="qmark partial">4/5</span></div>
+      <div class="qans">current instruction register (CIR): It&#39;s a register that stores the Data of the instruction to be Fetchy and decoded by CU
+Control unit Core: This is a processing unit within the CPU that can fetch, decode and execute instructions.
+Instruction set: This is a list of all the commands that can be processed by the CPU
+cache: it&#39;s Fast memory that cpu components can access quickly without reaching ran
+accumulator: it&#39;s a register that stores values during calculations done by ALU</div>
+      <div class="qfb">Correct pairs awarded for: CIR (describes storing the instruction to be fetched/decoded), core (correctly matched to given definition), instruction set (correctly matched to given definition), and accumulator (stores values from ALU calculations, matching &#39;stores result of interim calculations&#39;).</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>5(b)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">Control unit</div>
+      <div class="qfb">Correctly identified the Control Unit as the component responsible for decoding instructions.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>5(c)</span><span class="qmark partial">2/3</span></div>
+      <div class="qans">by increasing clock speed performance can increase significantly as more FDC cat Fetch, decode, execute cycles can be done within a given time</div>
+      <div class="qfb">Answer correctly states that increasing clock speed increases performance, and that more FDE cycles can be done in a given time, matching two valid points from the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>6(a)</span><span class="qmark full">8/8</span></div>
+      <div class="qans">Data is encrypted using an encryption key. This is a type of algorithm that scrambles the plain text and turns it into cipher text. This makes the data meaningless A public key is used to encrypt the data. This key cannot be used to decrypt the data. A private key is used to decrypt the data. Any device is able to request the public key, but only your device knows the private key.</div>
+      <div class="qfb">All eight blanks correctly completed: algorithm, plain text, cipher text, meaningless, public (encrypt), private (decrypt), public (requested key), private (device-known key) - matching the required terms in the correct positions.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>6(b)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">it&#39;s harder to decrypt as a hacker doesn&#39;t have private key while in symmetric, a hacker can access the encryption key by intercepting the data</div>
+      <div class="qfb">The answer explains that asymmetric encryption is harder to decrypt/hack because the private key is not shared, unlike symmetric encryption where the key could be intercepted - this conveys the idea that the process is more secure, matching the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(a)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">Read only memory</div>
+      <div class="qfb">Read only memory (ROM) is listed as a valid example of primary storage in the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(b)</span><span class="qmark partial">1/3</span></div>
+      <div class="qans">as it&#39;s directly accessible by c.p.m., and it&#39;s required for system to boot, also, it&#39;s one of the main parts of the vann new man structure</div>
+      <div class="qfb">Credit given for &#39;directly accessible by c.p.u.&#39; which matches the mark scheme point that RAM is directly accessed by the CPU.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(c)</span><span class="qmark partial">2/3</span></div>
+      <div class="qans">least important files are transferred from ram to virtual memory. Virtual memory provides the system with the amount of memory needed. Some parts of application are transferred to the virtual memory in order for the app to run</div>
+      <div class="qfb">Credit given for describing that (least important) data/pages are transferred from RAM to virtual memory, and for the idea that virtual memory provides the extra memory needed, effectively acting as an extension to RAM.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(d)(i)</span><span class="qmark zero">0/2</span></div>
+      <div class="qans">1 it&#39;s thinner and lighter than Hard disk drives
+2 it&#39;s more durable (robust) &amp; since there are less moving parts</div>
+      <div class="qfb">No marks awarded. The answer describes general consequences (thinner/lighter, more durable) rather than the specific technical features required by the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(d)(ii)</span><span class="qmark full">2/2</span></div>
+      <div class="qans">1 Solid State drive (SSD)
+2 Flash memory sticks</div>
+      <div class="qfb">Both examples given (Solid State drive (SSD) and Flash memory sticks) match valid answers from the mark scheme (SSD and USB flash memory drive/similar).</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(a)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">It&#39;s programmable</div>
+      <div class="qfb">Answer states &#39;It&#39;s programmable&#39;, which matches the mark scheme point &#39;It is programmable.&#39;</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(b)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">it&#39;s low level code that&#39;s directly accessed by CPU and used to run the system</div>
+      <div class="qfb">No marks awarded, as the answer does not match any of the accepted points on the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(c)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">1 When an error occurs
+2 When a process is done</div>
+      <div class="qfb">‘When an error occurs’ can be credited as it aligns with ‘hardware error’ / ‘software error’ from the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(d)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">1 they can carry heavy car parts
+2 they can work 24/7</div>
+      <div class="qfb">The first point, that robots can carry heavy car parts, aligns with the mark scheme point &#39;Workers don&#39;t need to lift heavy machinery&#39;, so credit is given.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(e)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">Machine learning</div>
+      <div class="qfb">Correctly identified &#39;Machine learning&#39; as required by the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(a)</span><span class="qmark partial">2/3</span></div>
+      <div class="qans">Operating system avoids two processes at the trying to access the same address. It can move partial a program or file to virtual memory. It can speed up system by prioritizing important tasks</div>
+      <div class="qfb">Credit given for: &#39;avoids two processes trying to access the same address&#39; (matches making sure two processes do not access the same memory location) and &#39;move partial a program or file to virtual memory&#39; (matches creating virtual memory/moving data between memory and storage).</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(b)(i)</span><span class="qmark full">2/2</span></div>
+      <div class="qans">by trying to enter many passwords automatically or manually until he can gain access to the correct password and access the sensitive information</div>
+      <div class="qfb">Mentions trying many passwords automatically or manually until correct one is found (matches &#39;repeatedly entering different combinations/passwords&#39; and &#39;use software to do it automatically&#39;).</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(b)(ii)</span><span class="qmark partial">1/3</span></div>
+      <div class="qans">1 Proxy Server
+2 Firewall
+3 Timeout for amount of wrong passwords entered</div>
+      <div class="qfb">Point 3 (&#39;timeout for amount of wrong passwords entered&#39;) matches the mark scheme point &#39;limiting the number of login attempts&#39;.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(c)(i)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">it&#39;s a decentralized currency that is fully virtual and depends on Blockchain</div>
+      <div class="qfb">States currency is &#39;fully virtual&#39;, matching the mark scheme&#39;s requirement that it exists only electronically/virtually.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(c)(ii)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">blockchain</div>
+      <div class="qfb">Correctly identified the process as &#39;blockchain&#39;, matching the mark scheme exactly.</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

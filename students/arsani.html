@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --background:#F5F3FC; --foreground:#171423; --card:#FFFFFF;
+    --primary:#4C3BCF; --primary-foreground:#FFFFFF; --secondary:#3DC2EC;
+    --muted:#EEEBFB; --muted-foreground:rgba(23,20,35,.55);
+    --accent:#EEEBFB; --accent-foreground:#4C3BCF;
+    --brand-highlight:#FFDE1A; --brand-highlight-foreground:#171423;
+    --destructive:#D64545; --destructive-foreground:#FFFFFF;
+    --border:rgba(23,20,35,.08); --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --background:#171423; --foreground:#F5F3FC; --card:#211C33;
+      --primary:#6E5EE0; --secondary:#3DC2EC; --muted:#2B2440;
+      --muted-foreground:rgba(245,243,252,.6); --accent:#2B2440;
+      --accent-foreground:#B6ABF5; --destructive:#E4685F; --destructive-foreground:#171423;
+      --border:rgba(245,243,252,.1);
+    }
+  }
+  :root[data-theme="dark"]{
+    --background:#171423; --foreground:#F5F3FC; --card:#211C33;
+    --primary:#6E5EE0; --secondary:#3DC2EC; --muted:#2B2440;
+    --muted-foreground:rgba(245,243,252,.6); --accent:#2B2440;
+    --accent-foreground:#B6ABF5; --destructive:#E4685F; --destructive-foreground:#171423;
+    --border:rgba(245,243,252,.1);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--background); color:var(--foreground);
+    font-family:'Montserrat',system-ui,sans-serif; padding:32px 16px 80px;
+  }
+  .wrap{max-width:960px;margin:0 auto;}
+  h1{font-size:1.6rem;font-weight:800;margin:0 0 4px;text-wrap:balance;}
+  .sub{color:var(--muted-foreground);font-size:.9rem;margin-bottom:28px;font-variant-numeric:tabular-nums;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px;}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+  .stat .n{font-size:1.6rem;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;}
+  .stat .l{font-size:.78rem;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+  .legend{display:flex;gap:16px;margin:0 0 14px;font-size:.8rem;color:var(--muted-foreground);}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:5px;}
+  .board{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  a.row{color:inherit;text-decoration:none;display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);}
+  a.row:last-child{border-bottom:none;}
+  a.row:hover{background:var(--accent);}
+  a.row:focus-visible{outline:2px solid var(--primary);outline-offset:-2px;}
+  .rank{width:22px;font-weight:800;color:var(--muted-foreground);text-align:center;font-variant-numeric:tabular-nums;}
+  .name{flex:1;font-weight:600;}
+  .barwrap{flex:2;height:8px;background:var(--muted);border-radius:99px;overflow:hidden;}
+  .bar{height:100%;background:var(--primary);border-radius:99px;}
+  .pct{width:48px;text-align:right;font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums;}
+  .score{width:60px;text-align:right;color:var(--muted-foreground);font-size:.85rem;font-variant-numeric:tabular-nums;}
+  .chev{width:16px;color:var(--muted-foreground);}
+  .qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;}
+  .qcard{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:var(--background);}
+  .qhead{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.8rem;margin-bottom:5px;font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .qmark{padding:1px 8px;border-radius:99px;font-size:.72rem;font-weight:700;font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .full{background:var(--primary);color:var(--primary-foreground);}
+  .partial{background:var(--brand-highlight);color:var(--brand-highlight-foreground);}
+  .zero{background:var(--destructive);color:var(--destructive-foreground);}
+  .qans{font-size:.8rem;color:var(--muted-foreground);white-space:pre-line;margin-bottom:5px;}
+  .qfb{font-size:.78rem;color:var(--accent-foreground);white-space:pre-line;}
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted-foreground);text-decoration:none;font-size:.85rem;font-weight:600;margin-bottom:16px;}
+  .back:hover{color:var(--primary);}
+  .back:focus-visible{outline:2px solid var(--primary);outline-offset:2px;}
+  .studenthead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
+  .studenthead h1{margin:0;}
+  .bigpct{font-size:1.6rem;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;}
+
+  @media (max-width: 640px){
+    body{padding:20px 12px 60px;}
+    .cards{grid-template-columns:repeat(2,1fr);}
+    .board{border-radius:8px;}
+    a.row{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      grid-template-areas:
+        "rank name chev"
+        "bar bar bar"
+        "pct pct score";
+      row-gap:6px;
+      column-gap:10px;
+      padding:12px 14px;
+    }
+    .rank{grid-area:rank;}
+    .name{grid-area:name;min-width:0;overflow-wrap:break-word;}
+    .chev{grid-area:chev;}
+    .barwrap{grid-area:bar;}
+    .pct{grid-area:pct;width:auto;text-align:left;}
+    .score{grid-area:score;width:auto;}
+    .qgrid{grid-template-columns:1fr;}
+    .qhead{font-size:.78rem;}
+    .studenthead{display:block;}
+    .bigpct{display:block;margin-top:4px;}
+  }
+</style>
+<title>Arsani — Quiz 6 Results</title>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">&larr; Class results</a>
+  <div class="studenthead">
+    <h1>Arsani</h1>
+    <div class="bigpct">26/75 &middot; 35%</div>
+  </div>
+  <div class="sub">Rank 6 of 6 · submitted 9/12/2026, 7:35:32 PM</div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--primary)"></span>Full marks</span>
+    <span><span class="dot" style="background:var(--brand-highlight)"></span>Partial</span>
+    <span><span class="dot" style="background:var(--destructive)"></span>No marks</span>
+  </div>
+  <div class="qgrid">
+    <div class="qcard">
+      <div class="qhead"><span>1(a)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">D</div>
+      <div class="qfb">Correct answer D selected, matching the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>1(b)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">2048 tebibytes</div>
+      <div class="qfb">Correct answer of 2048 given (2 PiB = 2048 TiB).</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>1(c)(i)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">Compression</div>
+      <div class="qfb">Correct answer &#39;Compression&#39; matches the mark scheme&#39;s required answer (Data) Compression.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>1(c)(ii)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">May be too large to move between devices</div>
+      <div class="qfb">The answer identifies that large files may be too big to transfer between devices, which aligns with the mark scheme&#39;s point about needing less storage space/being easier to move, a valid reason for reducing file size.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(a)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(b)(i)</span><span class="qmark full">2/2</span></div>
+      <div class="qans">14B: 000101001011
+97A: 100101111010</div>
+      <div class="qfb">Both hexadecimal values are correctly converted to binary: 14B → 000101001011 and 97A → 100101111010, matching the expected binary representations (0001 0100 1011 and 1001 0111 1010).</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(b)(ii)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">1. More easy to read
+2. </div>
+      <div class="qfb">First point &#39;more easy to read&#39; matches the mark scheme point &#39;easier/quicker for the customer to understand/read&#39;.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(c)(i)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">02C: 44
+10B: 257</div>
+      <div class="qfb">02C correctly converted to 44.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>2(c)(ii)</span><span class="qmark full">2/2</span></div>
+      <div class="qans">109: 6D
+415: 19F</div>
+      <div class="qfb">Both hexadecimal conversions are correct: 109 = 6D and 415 = 19F.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>3</span><span class="qmark partial">3/4</span></div>
+      <div class="qans">| Term | Definition |
+| --- | --- |
+| Pixel | This is the smallest component of an image. |
+| resolution | This is the number of pixels in an image. |
+| Colour depth | This is the number of bits used to create each colour in an image. |
+| Meta tag | This is additional data that is stored with an image that can provide information such as the time and date the image was taken. |</div>
+      <div class="qfb">Correct term &#39;Pixel&#39; for smallest component; correct resolution definition (number of pixels in an image); correct term &#39;Colour depth&#39; for bit-based colour definition.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(a)(i)</span><span class="qmark zero">0/2</span></div>
+      <div class="qans">1. 
+2. </div>
+      <div class="qfb">No content provided in the answer.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(a)(ii)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(b)(i)</span><span class="qmark zero">0/5</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(b)(ii)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(c)(i)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">D</div>
+      <div class="qfb">Correct answer D selected, matching the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>4(c)(ii)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">Because they may arrive not in order</div>
+      <div class="qfb">States that packets may arrive not in order, matching the mark scheme point &#39;The packets arrive in the wrong order.&#39;</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>5(a)</span><span class="qmark partial">1/5</span></div>
+      <div class="qans">| Term | Definition |
+| --- | --- |
+| current instruction register (CIR) | ... ... ... |
+| Control Unit | This is a processing unit within the CPU that can fetch, decode and execute instructions. |
+| instruction set | This is a list of all the commands that can be processed by the CPU. |
+| cache | ... ... ... |
+| accumulator | ... ... ... |</div>
+      <div class="qfb">Correct pair: instruction set – &#39;This is a list of all the commands that can be processed by the CPU.&#39;</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>5(b)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>5(c)</span><span class="qmark zero">0/3</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>6(a)</span><span class="qmark partial">7/8</span></div>
+      <div class="qans">Data is encrypted using an encryption key. This is a type of algorithm that scrambles the plain text and turns it into cipher text. This makes the data unreadable. A public key is used to encrypt the data. This key cannot be used to decrypt the data. A private key is used to decrypt the data. Any device is able to request the public key, but only your device knows the private key.</div>
+      <div class="qfb">Correct terms used in the correct positions for: algorithm, plain text, cipher text, public (encrypt key), private (decrypt key), public (device request), private (only your device knows) — 7 marks awarded.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>6(b)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">Harder to decrypt</div>
+      <div class="qfb">No marks awarded.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(a)</span><span class="qmark full">1/1</span></div>
+      <div class="qans">ROM</div>
+      <div class="qfb">ROM is a valid example of primary storage as listed in the mark scheme.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(b)</span><span class="qmark partial">1/3</span></div>
+      <div class="qans">Because it receives instructions from CPU</div>
+      <div class="qfb">The point that RAM receives instructions from the CPU aligns with the mark scheme point &#39;RAM is directly accessed by the CPU&#39;, earning 1 mark.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(c)</span><span class="qmark zero">0/3</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(d)(i)</span><span class="qmark zero">0/2</span></div>
+      <div class="qans">1. Faster data transmission
+2. </div>
+      <div class="qfb">No marks earned; &#39;faster data transmission&#39; is not a listed feature and no second point was given.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>7(d)(ii)</span><span class="qmark partial">1/2</span></div>
+      <div class="qans">1. SD Card
+2. </div>
+      <div class="qfb">SD Card is a valid example of solid-state (flash memory) storage.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(a)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(b)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(c)</span><span class="qmark zero">0/2</span></div>
+      <div class="qans">1. 
+2. </div>
+      <div class="qfb">No content provided in the answer.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(d)</span><span class="qmark zero">0/2</span></div>
+      <div class="qans">1. 
+2. </div>
+      <div class="qfb">No content provided in the answer.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>8(e)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(a)</span><span class="qmark zero">0/3</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(b)(i)</span><span class="qmark zero">0/2</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer was provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(b)(ii)</span><span class="qmark zero">0/3</span></div>
+      <div class="qans">1. ...
+2. ...
+3. ...</div>
+      <div class="qfb">No content provided; the answer contains only placeholder text (&#39;...&#39;) with no valid cyber security solutions listed.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(c)(i)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer was provided.</div>
+    </div>
+    <div class="qcard">
+      <div class="qhead"><span>9(c)(ii)</span><span class="qmark zero">0/1</span></div>
+      <div class="qans">(no answer)</div>
+      <div class="qfb">No answer provided.</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
